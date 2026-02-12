@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Una pregunta importante 💘</title>
+  <style>
+    :root{
+      --bg1:#fff1f6;
+      --bg2:#fdf2ff;
+      --card:#ffffffcc;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --yes:#22c55e;
+      --no:#ef4444;
+      --shadow: 0 18px 60px rgba(0,0,0,.12);
+      --radius: 22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(1200px 600px at 10% 10%, var(--bg2), transparent 60%),
+        radial-gradient(1000px 700px at 90% 20%, var(--bg1), transparent 55%),
+        linear-gradient(180deg, #fff, #fff7fb);
+      overflow:hidden;
+    }
+
+    .wrap{
+      width:min(920px, 92vw);
+      padding: 28px 20px;
+    }
+
+    .card{
+      position:relative;
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 32px);
+      overflow:hidden;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#ffffffb8;
+      border:1px solid rgba(0,0,0,.06);
+      margin-bottom: 14px;
+    }
+    .badge .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(180deg, #ff4d8d, #ffb703);
+      box-shadow: 0 0 0 6px rgba(255,77,141,.15);
+    }
+
+    h1{
+      margin: 6px 0 10px;
+      font-size: clamp(26px, 3.2vw, 44px);
+      letter-spacing:-.02em;
+      line-height:1.05;
+    }
+    p{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: clamp(14px, 1.7vw, 18px);
+      line-height:1.45;
+    }
+
+    .stage{
+      position:relative;
+      height: 240px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.35));
+      border: 1px dashed rgba(0,0,0,.08);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .question{
+      text-align:center;
+      padding: 14px 14px 0;
+    }
+
+    .buttons{
+      position:relative;
+      width:100%;
+      height: 160px;
+      margin-top: 18px;
+    }
+
+    button{
+      cursor:pointer;
+      border:none;
+      font-weight:800;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 18px;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+      box-shadow: 0 12px 30px rgba(0,0,0,.12);
+      user-select:none;
+    }
+    button:active{ transform: translateY(1px) scale(.99); }
+
+    #yesBtn{
+      background: linear-gradient(180deg, #34d399, #16a34a);
+      color:white;
+      position:absolute;
+      left: 50%;
+      top: 54%;
+      transform: translate(-110%, -50%);
+    }
+    #yesBtn:hover{ filter: brightness(1.03); }
+
+    #noBtn{
+      background: linear-gradient(180deg, #fb7185, #ef4444);
+      color:white;
+      position:absolute;
+      left: 50%;
+      top: 54%;
+      transform: translate(10%, -50%);
+    }
+
+    .hint{
+      text-align:center;
+      margin-top: 10px;
+      color: rgba(107,114,128,.95);
+      font-size: 13px;
+    }
+
+    /* Modal */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,.35);
+      padding: 20px;
+      z-index:50;
+    }
+    .overlay.show{ display:grid; }
+
+    .modal{
+      width:min(720px, 94vw);
+      background:white;
+      border-radius: 26px;
+      box-shadow: 0 22px 90px rgba(0,0,0,.25);
+      padding: 26px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modal h2{
+      margin:0 0 8px;
+      font-size: 28px;
+      letter-spacing:-.02em;
+    }
+    .modal .details{
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid rgba(0,0,0,.06);
+      color:#111827;
+      line-height:1.5;
+    }
+    .close{
+      position:absolute;
+      right: 14px;
+      top: 14px;
+      border:none;
+      background:#f3f4f6;
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:none;
+    }
+
+    /* Confetti canvas */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:60;
+    }
+
+    /* Small hearts background */
+    .hearts{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.55;
+      filter: blur(.2px);
+    }
+    .heart{
+      position:absolute;
+      font-size: 18px;
+      animation: float 10s linear infinite;
+      opacity:.75;
+    }
+    @keyframes float{
+      from{ transform: translateY(260px) rotate(0deg); }
+      to{ transform: translateY(-360px) rotate(360deg); }
+    }
+
+    @media (max-width:520px){
+      .buttons{ height: 190px; }
+      #yesBtn{ transform: translate(-50%, -60%); left:50%; top:48%; }
+      #noBtn{ transform: translate(-50%, 20%); left:50%; top:48%; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="hearts" id="hearts"></div>
+
+      <div class="badge"><span class="dot"></span> Operación: Cita de San Valentín</div>
+
+      <h1>Hola, amor 👀</h1>
+      <p>
+        He estado pensando una cosa muy seria (y nada sospechosa).  
+        Responde con sinceridad: <b>¿te apetece una cita conmigo por San Valentín?</b>
+      </p>
+
+      <div class="stage">
+        <div class="question">
+          <div style="font-size:54px;">💘</div>
+          <div style="font-weight:900;font-size:20px;margin-top:6px;">
+            ¿Aceptas salir conmigo?
+          </div>
+          <div class="buttons" id="btnArea">
+            <button id="yesBtn">Sí 💚</button>
+            <button id="noBtn">No 🙃</button>
+          </div>
+          <div class="hint" id="hint">Pista: el “No” es un poco… tímido.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <button class="close" id="closeBtn">✕</button>
+      <h2>¡¡Sabía que dirías que sí!! 🥰</h2>
+      <p style="margin:0;color:#6b7280">
+        Perfecto. Aquí viene el plan (y no hay opción de cancelar 😌).
+      </p>
+
+      <div class="details" id="details">
+        <b>📅 Día:</b> Viernes 14<br/>
+        <b>🕗 Hora:</b> 20:30<br/>
+        <b>📍 Lugar:</b> (pon aquí una pista o el sitio)<br/>
+        <b>🎁 Dress code:</b> guapísima como siempre<br/>
+        <b>📝 Nota:</b> Te invito yo. Tú solo ven.
+      </div>
+
+      <p style="margin:14px 0 0;color:#6b7280;font-size:14px">
+        PD: si quieres, te mando la ubicación cuando respondas “trato hecho” 😏
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // ====== Personaliza aquí ======
+    const PLAN = {
+      dia: "Viernes 14",
+      hora: "20:30",
+      lugar: "Pista: donde hacen tu postre favorito 😋",
+      dress: "guapísima como siempre",
+      nota: "Te invito yo. Tú solo ven."
+    };
+    // ==============================
+
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const btnArea = document.getElementById("btnArea");
+    const hint = document.getElementById("hint");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closeBtn");
+    const details = document.getElementById("details");
+
+    // Set final details
+    details.innerHTML =
+      `<b>📅 Día:</b> ${PLAN.dia}<br/>
+       <b>🕗 Hora:</b> ${PLAN.hora}<br/>
+       <b>📍 Lugar:</b> ${PLAN.lugar}<br/>
+       <b>🎁 Dress code:</b> ${PLAN.dress}<br/>
+       <b>📝 Nota:</b> ${PLAN.nota}`;
+
+    // Hearts background
+    const hearts = document.getElementById("hearts");
+    const heartChars = ["💗","💖","💘","💞","💕"];
+    for(let i=0;i<18;i++){
+      const s = document.createElement("div");
+      s.className = "heart";
+      s.textContent = heartChars[i % heartChars.length];
+      s.style.left = Math.random()*100 + "%";
+      s.style.animationDuration = (7 + Math.random()*8) + "s";
+      s.style.fontSize = (14 + Math.random()*18) + "px";
+      s.style.opacity = (0.35 + Math.random()*0.55);
+      s.style.animationDelay = (-Math.random()*12) + "s";
+      hearts.appendChild(s);
+    }
+
+    // No-button behavior
+    let noCount = 0;
+    const noPhrases = [
+      "¿Seguro? 🤨",
+      "Piénsalo bien… 😏",
+      "Te estás equivocando de botón 😌",
+      "Última oportunidad… 👀",
+      "Ok, ya paro (mentira) 😈",
+      "No disponible. Intente con “Sí” ✅"
+    ];
+
+    function moveNoButton(){
+      const area = btnArea.getBoundingClientRect();
+      const btn = noBtn.getBoundingClientRect();
+
+      // Keep inside area (with padding)
+      const pad = 12;
+      const maxX = area.width - btn.width - pad;
+      const maxY = area.height - btn.height - pad;
+
+      const x = pad + Math.random() * Math.max(0, maxX - pad);
+      const y = pad + Math.random() * Math.max(0, maxY - pad);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+      noBtn.style.transform = "translate(0,0)";
+    }
+
+    function shrinkNoButton(){
+      const scale = Math.max(0.55, 1 - noCount * 0.08);
+      noBtn.style.transform = `translate(0,0) scale(${scale})`;
+    }
+
+    function growYesButton(){
+      const scale = 1 + Math.min(0.6, noCount * 0.08);
+      yesBtn.style.transform = `translate(-110%, -50%) scale(${scale})`;
+    }
+
+    function setHint(text){
+      hint.textContent = text;
+    }
+
+    // Trigger on hover/touch attempts
+    const dodge = (e) => {
+      noCount++;
+      setHint(noPhrases[Math.min(noPhrases.length-1, noCount-1)]);
+      moveNoButton();
+      shrinkNoButton();
+      growYesButton();
+    };
+
+    // Desktop: hover; Mobile: touch/click
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); dodge(e); }, {passive:false});
+    noBtn.addEventListener("click", (e)=>{ e.preventDefault(); dodge(e); });
+
+    // Yes -> success
+    yesBtn.addEventListener("click", () => {
+      overlay.classList.add("show");
+      fireConfetti();
+    });
+
+    closeBtn.addEventListener("click", () => overlay.classList.remove("show"));
+    overlay.addEventListener("click", (e) => {
+      if(e.target === overlay) overlay.classList.remove("show");
+    });
+
+    // Simple confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function fireConfetti(){
+      const pieces = Array.from({length: 220}, () => ({
+        x: Math.random()*canvas.width,
+        y: -20 - Math.random()*canvas.height*0.3,
+        vx: -2 + Math.random()*4,
+        vy: 2 + Math.random()*5,
+        size: 4 + Math.random()*6,
+        rot: Math.random()*Math.PI,
+        vr: -0.2 + Math.random()*0.4,
+        // Use random HSL without hardcoding specific colors
+        hue: Math.floor(Math.random()*360),
+      }));
+
+      let t = 0;
+      const duration = 180; // frames
+
+      (function anim(){
+        t++;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        for(const p of pieces){
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          p.vy += 0.03; // gravity
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = `hsl(${p.hue} 85% 60%)`;
+          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.8);
+          ctx.restore();
+        }
+
+        if(t < duration){
+          requestAnimationFrame(anim);
+        }else{
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+        }
+      })();
+    }
+
+    // Initial layout fix: if we moved to absolute coords, set them relative to btnArea
+    // On first dodge, buttons become positioned by left/top in the area.
+    // Ensure btnArea is relative (it is), so it's ok.
+  </script>
+</body>
+</html>
