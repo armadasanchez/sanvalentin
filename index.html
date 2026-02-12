@@ -15,8 +15,7 @@
       --shadow: 0 18px 60px rgba(0,0,0,.12);
       --radius: 22px;
     }
-
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
 
     body{
       margin:0;
@@ -38,26 +37,50 @@
     }
 
     .card{
+      position:relative;
       background:var(--card);
       backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,.65);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: clamp(18px, 3vw, 32px);
+      overflow:hidden;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#ffffffb8;
+      border:1px solid rgba(0,0,0,.06);
+      margin-bottom: 14px;
+    }
+    .badge .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: linear-gradient(180deg, #ff4d8d, #ffb703);
+      box-shadow: 0 0 0 6px rgba(255,77,141,.15);
     }
 
     h1{
       margin: 6px 0 10px;
       font-size: clamp(26px, 3.2vw, 44px);
+      letter-spacing:-.02em;
+      line-height:1.05;
     }
-
     p{
+      margin: 0 0 18px;
       color: var(--muted);
-      margin-bottom: 18px;
+      font-size: clamp(14px, 1.7vw, 18px);
+      line-height:1.45;
     }
 
     .stage{
       position:relative;
       min-height: 260px;
+      height:auto;
       padding: 18px 0;
       border-radius: 18px;
       background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(255,255,255,.35));
@@ -65,32 +88,416 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      overflow:hidden;
     }
 
     .question{
       text-align:center;
+      padding: 14px 14px 0;
     }
 
     .buttons{
       position:relative;
       width:100%;
-      height:160px;
-      margin-top:18px;
+      height: 160px;
+      margin-top: 18px;
     }
 
     button{
       cursor:pointer;
       border:none;
-      border-radius:999px;
-      padding:14px 18px;
-      font-weight:800;
-      font-size:18px;
-      box-shadow:0 12px 30px rgba(0,0,0,.12);
-      transition:.15s ease;
+      font-weight:900;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 18px;
+      transition: transform .15s ease, filter .15s ease;
+      box-shadow: 0 12px 30px rgba(0,0,0,.12);
+      user-select:none;
+      touch-action: manipulation;
     }
+    button:active{ transform: translateY(1px) scale(.99); }
 
     #yesBtn{
-      background:linear-gradient(180deg,#34d399,#16a34a);
+      background: linear-gradient(180deg, #34d399, #16a34a);
       color:white;
       position:absolute;
-      l
+      left: 50%;
+      top: 54%;
+      transform: translate(-110%, -50%);
+    }
+    #yesBtn:hover{ filter: brightness(1.03); }
+
+    #noBtn{
+      background: linear-gradient(180deg, #fb7185, #ef4444);
+      color:white;
+      position:absolute;
+      left: 50%;
+      top: 54%;
+      transform: translate(10%, -50%);
+      will-change:left, top, transform;
+    }
+
+    .hint{
+      text-align:center;
+      margin-top: 10px;
+      color: rgba(107,114,128,.95);
+      font-size: 13px;
+    }
+
+    /* Modal */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,.35);
+      padding: 20px;
+      z-index:50;
+    }
+    .overlay.show{ display:grid; }
+
+    .modal{
+      width:min(720px, 94vw);
+      background:white;
+      border-radius: 26px;
+      box-shadow: 0 22px 90px rgba(0,0,0,.25);
+      padding: 26px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modal h2{
+      margin:0 0 8px;
+      font-size: 28px;
+      letter-spacing:-.02em;
+    }
+    .close{
+      position:absolute;
+      right: 14px;
+      top: 14px;
+      border:none;
+      background:#f3f4f6;
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:none;
+    }
+    .details{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid rgba(0,0,0,.06);
+      color:#111827;
+      line-height:1.5;
+    }
+
+    /* Foto tipo polaroid */
+    .polaroid{
+      margin-top: 14px;
+      padding: 12px 12px 16px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 18px 50px rgba(0,0,0,.14);
+      transform: rotate(-1.2deg);
+    }
+    .polaroid img{
+      width: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      border-radius: 14px;
+      display:block;
+    }
+    .polaroid .caption{
+      margin-top: 10px;
+      text-align:center;
+      font-weight:900;
+      color:#111827;
+      letter-spacing:-.01em;
+    }
+
+    /* Confetti canvas */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:60;
+    }
+
+    /* Hearts burst on YES */
+    .yes-hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:65;
+      overflow:hidden;
+      display:none;
+    }
+    .yes-hearts.show{ display:block; }
+    .yes-heart{
+      position:absolute;
+      bottom:-40px;
+      opacity:.9;
+      animation: rise 2.8s ease-in forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes rise{
+      0%   { transform: translateY(0) translateX(0) rotate(0deg) scale(1); opacity:0; }
+      10%  { opacity:1; }
+      100% { transform: translateY(-110vh) translateX(var(--dx)) rotate(var(--rot)) scale(var(--sc)); opacity:0; }
+    }
+
+    @media (max-width:520px){
+      .buttons{ height: 190px; }
+      #yesBtn{ transform: translate(-50%, -60%); left:50%; top:48%; }
+      #noBtn{ transform: translate(-50%, 20%); left:50%; top:48%; }
+      .stage{ min-height:300px; }
+      .polaroid{ transform: rotate(0deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="yes-hearts" id="yesHearts"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="badge"><span class="dot"></span> Operación: Cita de San Valentín</div>
+
+      <h1>Holi Bichiculo 👀</h1>
+      <p>
+        Después de darle mucho al coco y currarme mucho la manera para invitarte a salir por San Valentín...
+        se me ha ocurrido una idea muy original 😌. Por eso te mando esta propuesta online:
+      </p>
+
+      <div class="stage">
+        <div class="question">
+          <div style="font-size:54px; margin-bottom:10px;">💘</div>
+          <div style="font-weight:900;font-size:20px;">¿Aceptas salir conmigo?</div>
+
+          <div class="buttons" id="btnArea">
+            <button id="yesBtn">Sí ❤️</button>
+            <button id="noBtn">No 🙃</button>
+          </div>
+
+          <div class="hint" id="hint">Pista: el “No” es un poco… tímido.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <button class="close" id="closeBtn">✕</button>
+      <h2>¡¡Sabía que dirías que sí!! 🥰</h2>
+      <p style="margin:0;color:#6b7280">
+        Perfecto. Aquí viene el plan (y no hay opción de cancelar 😌).
+      </p>
+
+      <!-- FOTO EN LA RAÍZ -->
+      <div class="polaroid">
+        <img src="IMG_5412.jpg" alt="Nuestra foto" />
+        <div class="caption">Cita confirmada ✅</div>
+      </div>
+
+      <div class="details">
+        <b>📅 Día:</b> Sábado 14<br/>
+        <b>🕗 Hora:</b> Toda la tarde y noche (fiesta de pijamas incluida)<br/>
+        <b>📍 Lugar:</b> Murcia<br/>
+        <b>🎁 Dress code:</b> guapísima como siempre<br/>
+        <b>📝 Nota:</b> Te invito yo. Tú solo ven.
+      </div>
+
+      <p style="margin:14px 0 0;color:#6b7280;font-size:14px">
+        PD: respóndeme “trato hecho” y te mando la ubicación 😏
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const btnArea = document.getElementById("btnArea");
+    const hint = document.getElementById("hint");
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closeBtn");
+    const yesHearts = document.getElementById("yesHearts");
+
+    const noPhrases = [
+      "¿Seguro? 🤨",
+      "Piénsalo bien… 😏",
+      "Te estás equivocando de botón 😌",
+      "Uy, se me resbaló 🙃",
+      "Eso ha sido un misclick, lo sé.",
+      "No no no… ese no.",
+      "¿Quieres repetir y darle a “Sí”? 💚",
+      "Yo de ti… lo reconsideraba 😌",
+      "Última oportunidad… 👀",
+      "Modo tímido activado 🫣",
+      "Este botón está en prácticas.",
+      "No disponible. Intente con “Sí” ✅",
+      "Plot twist: el ‘No’ no funciona.",
+      "Si me quieres, ya sabes cuál… 😏",
+      "Venga va… que te invito yo 🥺",
+      "Error 404: NO encontrado.",
+      "Esto ya es insistencia del universo 💫",
+      "Ok, vale, paro… (mentira) 😈",
+      "Esta es la pantalla final: pulsa Sí ❤️"
+    ];
+
+    let noCount = 0;
+
+    function shrinkScale(){
+      return Math.max(0.55, 1 - noCount * 0.06);
+    }
+
+    function moveNoButton(){
+      const area = btnArea.getBoundingClientRect();
+      const btn = noBtn.getBoundingClientRect();
+      const pad = 12;
+
+      const cx = area.width * 0.5;
+      const cy = area.height * 0.54;
+
+      const base = 30;
+      const growth = 18;
+      const radius = Math.min(
+        Math.min(area.width, area.height) * 0.55,
+        base + noCount * growth
+      );
+
+      const ang = Math.random() * Math.PI * 2;
+
+      let x = cx + Math.cos(ang) * radius - btn.width/2;
+      let y = cy + Math.sin(ang) * radius - btn.height/2;
+
+      x = Math.max(pad, Math.min(x, area.width - btn.width - pad));
+      y = Math.max(pad, Math.min(y, area.height - btn.height - pad));
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+      noBtn.style.transform = `translate(0,0) scale(${shrinkScale().toFixed(2)})`;
+    }
+
+    function growYes(){
+      const s = 1 + Math.min(0.6, noCount * 0.05);
+      yesBtn.style.transform = `translate(-110%, -50%) scale(${s.toFixed(2)})`;
+    }
+
+    function setHint(){
+      const idx = Math.min(noPhrases.length - 1, noCount);
+      hint.textContent = noPhrases[idx];
+    }
+
+    const dodge = (e) => {
+      noCount++;
+      setHint();
+      moveNoButton();
+      growYes();
+    };
+
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); dodge(e); }, {passive:false});
+    noBtn.addEventListener("click", (e)=>{ e.preventDefault(); dodge(e); });
+
+    yesBtn.addEventListener("click", () => {
+      overlay.classList.add("show");
+      fireConfetti();
+      startYesHearts();
+    });
+
+    closeBtn.addEventListener("click", () => overlay.classList.remove("show"));
+    overlay.addEventListener("click", (e) => {
+      if(e.target === overlay) overlay.classList.remove("show");
+    });
+
+    // Confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function fireConfetti(){
+      const pieces = Array.from({length: 240}, () => ({
+        x: Math.random()*canvas.width,
+        y: -20 - Math.random()*canvas.height*0.3,
+        vx: -2 + Math.random()*4,
+        vy: 2 + Math.random()*5,
+        size: 4 + Math.random()*6,
+        rot: Math.random()*Math.PI,
+        vr: -0.2 + Math.random()*0.4,
+        hue: Math.floor(Math.random()*360),
+      }));
+
+      let t = 0;
+      const duration = 190;
+
+      (function anim(){
+        t++;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        for(const p of pieces){
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          p.vy += 0.03;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = `hsl(${p.hue} 85% 60%)`;
+          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.8);
+          ctx.restore();
+        }
+
+        if(t < duration){
+          requestAnimationFrame(anim);
+        }else{
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+        }
+      })();
+    }
+
+    // Hearts burst
+    function startYesHearts(){
+      yesHearts.classList.add("show");
+      yesHearts.innerHTML = "";
+
+      const chars = ["💗","💖","💘","💞","💕","❤️","🩷"];
+      const total = 42;
+
+      for(let i=0;i<total;i++){
+        const el = document.createElement("div");
+        el.className = "yes-heart";
+        el.textContent = chars[Math.floor(Math.random()*chars.length)];
+
+        const left = Math.random() * 100;
+        const dx = (-30 + Math.random()*60).toFixed(1) + "vw";
+        const rot = (-260 + Math.random()*520).toFixed(0) + "deg";
+        const sc = (0.6 + Math.random()*1.2).toFixed(2);
+
+        el.style.left = left + "vw";
+        el.style.setProperty("--dx", dx);
+        el.style.setProperty("--rot", rot);
+        el.style.setProperty("--sc", sc);
+        el.style.animationDelay = (Math.random()*0.45).toFixed(2) + "s";
+        el.style.fontSize = (18 + Math.random()*18).toFixed(0) + "px";
+
+        yesHearts.appendChild(el);
+      }
+
+      setTimeout(() => {
+        yesHearts.classList.remove("show");
+        yesHearts.innerHTML = "";
+      }, 3300);
+    }
+  </script>
+</body>
+</html>
